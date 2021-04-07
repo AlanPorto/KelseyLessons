@@ -21,6 +21,7 @@ namespace KelseyClass
                 {
                     case ConsoleKey.Escape:
                         return;
+
                     case ConsoleKey.UpArrow:
                         shouldRender = myMap.MovePlayer(Directions.Up);
                         break;

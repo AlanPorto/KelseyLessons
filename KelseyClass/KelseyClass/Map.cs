@@ -14,14 +14,15 @@ namespace KelseyClass
 
     public class Map
     {
-        public const int MaxRow = 4;
-        public const int MaxCol = 4;
+        public const int MaxRow = 8;
+        public const int MaxCol = 8;
 
         private char[,] MapArray = new char[MaxRow, MaxCol];
 
         private int mFrameCounter = 0;
 
-        private Character mPlayer = new Character();
+        private Player mPlayer = new Player();
+        private Monster mMonster = new Monster();
 
         public Map()
         {
@@ -34,6 +35,7 @@ namespace KelseyClass
             }
 
             MapArray[mPlayer.MyRow, mPlayer.MyCol] = mPlayer.Symbol;
+            MapArray[mMonster.MyRow, mMonster.MyCol] = mMonster.Symbol;
         }
 
         public bool MovePlayer(Directions dir)
@@ -44,7 +46,7 @@ namespace KelseyClass
             int targetRow = mPlayer.MyRow + row;
             int targetCol = mPlayer.MyCol + col;
 
-            if (InBound(targetRow, targetCol))
+            if (CanMoveTo(targetRow, targetCol, mMonster))
             {
                 MapArray[mPlayer.MyRow, mPlayer.MyCol] = '*';
                 MapArray[targetRow, targetCol] = mPlayer.Symbol;
@@ -60,12 +62,14 @@ namespace KelseyClass
 
         }
 
-        public bool InBound(int row, int col)
+        public bool CanMoveTo(int row, int col, Character enemy)
         {
             bool validRow = (row >= 0) && (row < MaxRow);
             bool validCol = (col >= 0) && (col < MaxCol);
 
-            return validRow && validCol;
+            bool isEnemyPos = (row == enemy.MyRow) && (col == enemy.MyCol);
+
+            return validRow && validCol && !isEnemyPos;
         }
 
         private void GetRowAndColForDirection(Directions dir, out int row, out int col)

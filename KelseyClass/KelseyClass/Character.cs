@@ -4,17 +4,11 @@ using System.Text;
 
 namespace KelseyClass
 {
-    public class Character
+    public abstract class Character
     {
-        public char Symbol { get; private set; }
+        public char Symbol { get; protected set; }
 
         public int MyRow = 0;
         public int MyCol = 0;
-
-        public Character()
-        {
-            Symbol = 'C';
-        }
-
     }
 }
