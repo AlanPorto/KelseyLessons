@@ -13,7 +13,7 @@ namespace KelseyClass
 
             while (true)
             {
-                bool shouldRender = false;
+                bool playerMoved = false;
 
                 ConsoleKey key = Console.ReadKey(false).Key;
 
@@ -23,25 +23,31 @@ namespace KelseyClass
                         return;
 
                     case ConsoleKey.UpArrow:
-                        shouldRender = myMap.MovePlayer(Directions.Up);
+                        playerMoved = myMap.MovePlayer(Directions.Up);
                         break;
 
                     case ConsoleKey.RightArrow:
-                        shouldRender = myMap.MovePlayer(Directions.Right);
+                        playerMoved = myMap.MovePlayer(Directions.Right);
                         break;
 
                     case ConsoleKey.DownArrow:
-                        shouldRender = myMap.MovePlayer(Directions.Down);
+                        playerMoved = myMap.MovePlayer(Directions.Down);
                         break;
 
                     case ConsoleKey.LeftArrow:
-                        shouldRender = myMap.MovePlayer(Directions.Left);
+                        playerMoved = myMap.MovePlayer(Directions.Left);
                         break;
                 }
 
-                if (shouldRender)
+                if (playerMoved)
                 {
+                    myMap.MoveEnemy();
                     myMap.Render();
+
+                    if (myMap.IsGameOver())
+                    {
+                        break;
+                    }
                 }
             }
         }

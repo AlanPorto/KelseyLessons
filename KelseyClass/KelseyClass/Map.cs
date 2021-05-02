@@ -17,7 +17,7 @@ namespace KelseyClass
         public const int MaxRow = 8;
         public const int MaxCol = 8;
 
-        private char[,] MapArray = new char[MaxRow, MaxCol];
+        private Tile[,] MapArray = new Tile[MaxRow, MaxCol];
 
         private int mFrameCounter = 0;
 
@@ -30,12 +30,44 @@ namespace KelseyClass
             {
                 for (int j = 0; j < MaxCol; j++)
                 {
-                    MapArray[i, j] = '*';
+                    Tile tile = new Tile('*');
+                    MapArray[i, j] = tile;
                 }
             }
 
-            MapArray[mPlayer.MyRow, mPlayer.MyCol] = mPlayer.Symbol;
-            MapArray[mMonster.MyRow, mMonster.MyCol] = mMonster.Symbol;
+            MapArray[mPlayer.MyRow, mPlayer.MyCol].CharRef = mPlayer;
+            MapArray[mMonster.MyRow, mMonster.MyCol].CharRef = mMonster;
+        }
+
+        public void MoveEnemy()
+        {
+            int targetRow = mMonster.MyRow;
+            int targetCol = mMonster.MyCol;
+
+            if (targetRow > mPlayer.MyRow)
+            {
+                targetRow--;
+            }
+            else if (targetRow < mPlayer.MyRow)
+            {
+                targetRow++;
+            }
+
+            if (targetCol > mPlayer.MyCol)
+            {
+                targetCol--;
+            }
+            else if (targetCol < mPlayer.MyCol)
+            {
+                targetCol++;
+            }
+
+            MapArray[mMonster.MyRow, mMonster.MyCol].CharRef = null;
+
+            mMonster.MyRow = targetRow;
+            mMonster.MyCol = targetCol;
+
+            MapArray[mMonster.MyRow, mMonster.MyCol].CharRef = mMonster;
         }
 
         public bool MovePlayer(Directions dir)
@@ -48,8 +80,8 @@ namespace KelseyClass
 
             if (CanMoveTo(targetRow, targetCol, mMonster))
             {
-                MapArray[mPlayer.MyRow, mPlayer.MyCol] = '*';
-                MapArray[targetRow, targetCol] = mPlayer.Symbol;
+                MapArray[mPlayer.MyRow, mPlayer.MyCol].CharRef = null;
+                MapArray[targetRow, targetCol].CharRef = mPlayer;
 
                 mPlayer.MyRow = targetRow;
                 mPlayer.MyCol = targetCol;
@@ -99,22 +131,34 @@ namespace KelseyClass
             }
         }
 
+        public bool IsGameOver()
+        {
+            return ((mPlayer.MyRow == mMonster.MyRow) && (mPlayer.MyCol == mMonster.MyCol));
+        }
+
         public void Render()
         {
             Console.Clear();
 
-            mFrameCounter++;
-
-            Console.WriteLine("--- Frame: " + mFrameCounter + " ---");
-
-            for (int i = 0; i < MaxRow; i++)
+            if (IsGameOver())
             {
-                for (int j = 0; j < MaxCol; j++)
-                {
-                    Console.Write(MapArray[i, j]);
-                }
+                Console.WriteLine("Game Over!");
+            }
+            else
+            {
+                mFrameCounter++;
 
-                Console.WriteLine();
+                Console.WriteLine("--- Frame: " + mFrameCounter + " ---");
+
+                for (int i = 0; i < MaxRow; i++)
+                {
+                    for (int j = 0; j < MaxCol; j++)
+                    {
+                        Console.Write(MapArray[i, j].Symbol);
+                    }
+
+                    Console.WriteLine();
+                }
             }
         }
     }
