@@ -9,8 +9,6 @@ namespace KelseyClass
         public Monster()
         {
             Symbol = 'M';
-            MyRow = Map.MaxRow - 1;
-            MyCol = Map.MaxCol - 1;
         }
     }
 }

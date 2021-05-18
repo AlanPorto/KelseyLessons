@@ -14,10 +14,10 @@ namespace KelseyClass
 
     public class Map
     {
-        public const int MaxRow = 8;
-        public const int MaxCol = 8;
+        public static int MaxRow;
+        public static int MaxCol;
 
-        private Tile[,] MapArray = new Tile[MaxRow, MaxCol];
+        private Tile[,] MapArray;
 
         private int mFrameCounter = 0;
 
@@ -26,14 +26,35 @@ namespace KelseyClass
 
         public Map()
         {
+
+            char[][] jaggedArray = new char[][]
+            {
+               new char[] { '*', '*', '*', '*', '*', '*', '*', '*', },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
+               new char[] { '*', '-', '-', '*', '*', '-', '-', '*', },
+               new char[] { '*', '-', '-', '*', '*', '-', '-', '*', },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
+               new char[] { '*', '*', '*', '*', '*', '*', '*', '*', },
+            };
+
+            MaxRow = jaggedArray.Length;
+            MaxCol = jaggedArray[0].Length;
+
+            MapArray = new Tile[MaxRow, MaxCol];
             for (int i = 0; i < MaxRow; i++)
             {
                 for (int j = 0; j < MaxCol; j++)
                 {
-                    Tile tile = new Tile('*');
+                    char symbol = jaggedArray[i][j];
+                    Tile tile = new Tile(symbol);
                     MapArray[i, j] = tile;
                 }
             }
+
+            mPlayer.MyRow = mPlayer.MyCol = 1;
+            mMonster.MyRow = mMonster.MyCol = 6;
 
             MapArray[mPlayer.MyRow, mPlayer.MyCol].CharRef = mPlayer;
             MapArray[mMonster.MyRow, mMonster.MyCol].CharRef = mMonster;
@@ -41,6 +62,7 @@ namespace KelseyClass
 
         public void MoveEnemy()
         {
+            return;
             int targetRow = mMonster.MyRow;
             int targetCol = mMonster.MyCol;
 
@@ -78,7 +100,7 @@ namespace KelseyClass
             int targetRow = mPlayer.MyRow + row;
             int targetCol = mPlayer.MyCol + col;
 
-            if (CanMoveTo(targetRow, targetCol, mMonster))
+            if (CanMoveTo(targetRow, targetCol))
             {
                 MapArray[mPlayer.MyRow, mPlayer.MyCol].CharRef = null;
                 MapArray[targetRow, targetCol].CharRef = mPlayer;
@@ -94,14 +116,14 @@ namespace KelseyClass
 
         }
 
-        public bool CanMoveTo(int row, int col, Character enemy)
+        public bool CanMoveTo(int row, int col)
         {
             bool validRow = (row >= 0) && (row < MaxRow);
             bool validCol = (col >= 0) && (col < MaxCol);
 
-            bool isEnemyPos = (row == enemy.MyRow) && (col == enemy.MyCol);
+            bool isEmpty = MapArray[row, col].IsEmpty();
 
-            return validRow && validCol && !isEnemyPos;
+            return validRow && validCol && isEmpty;
         }
 
         private void GetRowAndColForDirection(Directions dir, out int row, out int col)

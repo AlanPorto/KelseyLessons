@@ -6,7 +6,7 @@ namespace KelseyClass
 {
     public class Tile
     {
-        // --- Public
+        // --- Propertie
         public char Symbol
         {
             get
@@ -33,6 +33,11 @@ namespace KelseyClass
         public Tile(char symbol)
         {
             mSymbol = symbol;
+        }
+
+        public bool IsEmpty()
+        {
+            return (Symbol == '-');
         }
     }
 }
