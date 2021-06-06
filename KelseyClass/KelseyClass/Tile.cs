@@ -7,32 +7,14 @@ namespace KelseyClass
     public class Tile
     {
         // --- Propertie
-        public char Symbol
-        {
-            get
-            {
-                if (CharRef != null)
-                {
-                    return CharRef.Symbol;
-                }
-                else
-                {
-                    return mSymbol;
-                }
-            }
-        }
+        public char Symbol;
 
         public int MyRow = 0;
         public int MyCol = 0;
 
-        public Character CharRef;
-
-        // --- Private
-        private char mSymbol;
-
         public Tile(char symbol)
         {
-            mSymbol = symbol;
+            Symbol = symbol;
         }
 
         public bool IsEmpty()

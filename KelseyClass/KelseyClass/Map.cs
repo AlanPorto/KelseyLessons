@@ -17,7 +17,7 @@ namespace KelseyClass
         public static int MaxRow;
         public static int MaxCol;
 
-        private Tile[,] MapArray;
+        private Tile[,] MapArray; // Multi dimensional array
 
         private int mFrameCounter = 0;
 
@@ -29,35 +29,38 @@ namespace KelseyClass
 
             char[][] jaggedArray = new char[][]
             {
-               new char[] { '*', '*', '*', '*', '*', '*', '*', '*', },
-               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
-               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
-               new char[] { '*', '-', '-', '*', '*', '-', '-', '*', },
-               new char[] { '*', '-', '-', '*', '*', '-', '-', '*', },
-               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
-               new char[] { '*', '-', '-', '-', '-', '-', '-', '*', },
-               new char[] { '*', '*', '*', '*', '*', '*', '*', '*', },
+               new char[] { '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '-', '-', '*' },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '-', '-', '*' },
+               new char[] { '*', '-', '-', '*', '*', '-', '-', '-', '-', '*' },
+               new char[] { '*', '-', '-', '*', '*', '-', '-', '-', '-', '*' },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '-', '-', '*' },
+               new char[] { '*', '-', '-', '-', '-', '-', '-', '-', '-', '*' },
+               new char[] { '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' },
             };
 
             MaxRow = jaggedArray.Length;
             MaxCol = jaggedArray[0].Length;
 
             MapArray = new Tile[MaxRow, MaxCol];
+
+
             for (int i = 0; i < MaxRow; i++)
             {
                 for (int j = 0; j < MaxCol; j++)
                 {
                     char symbol = jaggedArray[i][j];
+
                     Tile tile = new Tile(symbol);
+                    tile.MyRow = i;
+                    tile.MyCol = j;
+
                     MapArray[i, j] = tile;
                 }
             }
 
             mPlayer.MyRow = mPlayer.MyCol = 1;
             mMonster.MyRow = mMonster.MyCol = 6;
-
-            MapArray[mPlayer.MyRow, mPlayer.MyCol].CharRef = mPlayer;
-            MapArray[mMonster.MyRow, mMonster.MyCol].CharRef = mMonster;
         }
 
         public void MoveEnemy()
@@ -84,12 +87,8 @@ namespace KelseyClass
                 targetCol++;
             }
 
-            MapArray[mMonster.MyRow, mMonster.MyCol].CharRef = null;
-
             mMonster.MyRow = targetRow;
             mMonster.MyCol = targetCol;
-
-            MapArray[mMonster.MyRow, mMonster.MyCol].CharRef = mMonster;
         }
 
         public bool MovePlayer(Directions dir)
@@ -100,11 +99,8 @@ namespace KelseyClass
             int targetRow = mPlayer.MyRow + row;
             int targetCol = mPlayer.MyCol + col;
 
-            if (CanMoveTo(targetRow, targetCol))
+            if (IsPositionEmptyAndValid(targetRow, targetCol, MapArray))
             {
-                MapArray[mPlayer.MyRow, mPlayer.MyCol].CharRef = null;
-                MapArray[targetRow, targetCol].CharRef = mPlayer;
-
                 mPlayer.MyRow = targetRow;
                 mPlayer.MyCol = targetCol;
                 return true;
@@ -116,17 +112,17 @@ namespace KelseyClass
 
         }
 
-        public bool CanMoveTo(int row, int col)
+        public static bool IsPositionEmptyAndValid(int row, int col, Tile[,] tileMap)
         {
             bool validRow = (row >= 0) && (row < MaxRow);
             bool validCol = (col >= 0) && (col < MaxCol);
 
-            bool isEmpty = MapArray[row, col].IsEmpty();
+            bool isEmpty = (validRow && validCol) && tileMap[row, col].IsEmpty();
 
             return validRow && validCol && isEmpty;
         }
 
-        private void GetRowAndColForDirection(Directions dir, out int row, out int col)
+        public static void GetRowAndColForDirection(Directions dir, out int row, out int col)
         {
             switch (dir)
             {
@@ -172,11 +168,40 @@ namespace KelseyClass
 
                 Console.WriteLine("--- Frame: " + mFrameCounter + " ---");
 
+                Tile monsterTile = MapArray[mMonster.MyRow, mMonster.MyCol];
+                Tile playerTile = MapArray[mPlayer.MyRow, mPlayer.MyCol];
+
+                List<Tile> path = Pathfinder.GetPath(monsterTile, playerTile, MapArray);
+
                 for (int i = 0; i < MaxRow; i++)
                 {
                     for (int j = 0; j < MaxCol; j++)
                     {
-                        Console.Write(MapArray[i, j].Symbol);
+                        char symbol;
+
+                        if (mPlayer.MyRow == i && mPlayer.MyCol == j)
+                        {
+                            symbol = mPlayer.Symbol;
+                        }
+                        else if (mMonster.MyRow == i && mMonster.MyCol == j)
+                        {
+                            symbol = mMonster.Symbol;
+                        }
+                        else
+                        {
+                            Tile currentTile = MapArray[i, j];
+
+                            if (path.Contains(currentTile))
+                            {
+                                symbol = 'x';
+                            }
+                            else
+                            {
+                                symbol = currentTile.Symbol;
+                            }
+                        }
+
+                        Console.Write(symbol);
                     }
 
                     Console.WriteLine();
